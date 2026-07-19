@@ -8,7 +8,7 @@ A Go service that polls an RSS feed and posts new items to Bluesky via the AT Pr
 
 ## Stack
 
-- **Language:** Go (1.23+)
+- **Language:** Go (1.26+)
 - **RSS parsing:** `github.com/mmcdole/gofeed`
 - **Scheduling:** `github.com/robfig/cron/v3` (in-process, not host cron)
 - **Storage:** SQLite via `modernc.org/sqlite` (pure Go, no cgo) — stores posted items for dedup, keyed by a unique `origin` column with a generated UUID (`github.com/google/uuid`) `id` primary key
@@ -59,7 +59,7 @@ docker compose logs -f
 
 ### Without Docker
 
-Requires a local Go 1.23+ toolchain (`brew install go`).
+Requires a local Go 1.26+ toolchain (`brew install go`).
 
 ```bash
 make check   # build + vet + test

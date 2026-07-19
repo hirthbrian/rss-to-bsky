@@ -14,7 +14,7 @@ A small Go service that polls an RSS feed and posts new items to [Bluesky](https
 ## Requirements
 
 - A Bluesky account and an [app password](https://bsky.app/settings/app-passwords) (never use your real account password)
-- Docker + Docker Compose (recommended), or a local Go 1.23+ toolchain
+- Docker + Docker Compose (recommended), or a local Go 1.26+ toolchain
 
 ## Setup
 
@@ -52,7 +52,7 @@ Posted item state is persisted in `./data/posted.db` (mounted into the container
 
 ## Running without Docker
 
-Requires a local Go 1.23+ toolchain.
+Requires a local Go 1.26+ toolchain.
 
 ```bash
 make check   # build + vet + test
