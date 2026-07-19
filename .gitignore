@@ -1,2 +1,4 @@
 .env
 data/
+rss-to-bsky
+.DS_Store

@@ -12,12 +12,17 @@ import (
 	"github.com/brianhirth/rss-to-bsky/internal/store"
 )
 
-const dbPath = "/data/posted.db"
+const defaultDBPath = "/data/posted.db"
 
 func main() {
 	rssURL := requireEnv("RSS_URL")
 	handle := requireEnv("BSKY_HANDLE")
 	appPassword := requireEnv("BSKY_APP_PASSWORD")
+
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = defaultDBPath
+	}
 
 	st, err := store.Open(dbPath)
 	if err != nil {
