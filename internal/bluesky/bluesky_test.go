@@ -87,7 +87,7 @@ func TestSessionPost_Success(t *testing.T) {
 	})
 
 	sess := &Session{AccessJwt: "token-123", Did: "did:plc:abc"}
-	if err := sess.Post("hello world", ""); err != nil {
+	if err := sess.Post("hello world", "", nil); err != nil {
 		t.Fatalf("Post() error = %v", err)
 	}
 }
@@ -98,7 +98,7 @@ func TestSessionPost_NonOKStatus(t *testing.T) {
 	})
 
 	sess := &Session{AccessJwt: "token-123", Did: "did:plc:abc"}
-	if err := sess.Post("hello world", ""); err == nil {
+	if err := sess.Post("hello world", "", nil); err == nil {
 		t.Fatal("expected error for non-200 response")
 	}
 }

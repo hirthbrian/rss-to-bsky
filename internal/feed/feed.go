@@ -11,9 +11,10 @@ import (
 const maxPostChars = 280
 
 type Item struct {
-	GUID string
-	Text string
-	Link string
+	GUID  string
+	Title string
+	Text  string
+	Link  string
 }
 
 func Fetch(url string) ([]Item, error) {
@@ -33,9 +34,10 @@ func Fetch(url string) ([]Item, error) {
 			continue
 		}
 		items = append(items, Item{
-			GUID: guid,
-			Text: formatPost(raw),
-			Link: raw.Link,
+			GUID:  guid,
+			Title: raw.Title,
+			Text:  formatPost(raw),
+			Link:  raw.Link,
 		})
 	}
 	return items, nil
