@@ -1,0 +1,12 @@
+services:
+  rss-to-bsky:
+    build: .
+    restart: unless-stopped
+    environment:
+      RSS_URL: https://example.com/feed.xml
+      BSKY_HANDLE: example.bsky.social
+      BSKY_APP_PASSWORD: ${BSKY_APP_PASSWORD}
+    volumes:
+      - ./data:/data
+    env_file:
+      - .env
