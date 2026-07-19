@@ -3,6 +3,7 @@ module github.com/brianhirth/rss-to-bsky
 go 1.23
 
 require (
+	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/google/uuid v1.6.0
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -10,7 +11,6 @@ require (
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect

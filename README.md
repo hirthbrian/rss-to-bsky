@@ -7,6 +7,7 @@ A small Go service that polls an RSS feed and posts new items to [Bluesky](https
 - Polls an RSS feed on a schedule (every 15 minutes by default) and posts new items to Bluesky
 - Tracks posted items in a local SQLite database so restarts don't repost the entire feed
 - Renders links in posts as proper clickable rich-text links, not plain text
+- Attaches a link preview card (title, description, thumbnail) pulled from the article's Open Graph tags
 - Truncates post text to fit Bluesky's character limit without ever cutting off a link mid-URL
 - Pure Go, no cgo — small Alpine-based Docker image
 
@@ -54,22 +55,30 @@ Posted item state is persisted in `./data/posted.db` (mounted into the container
 Requires a local Go 1.23+ toolchain.
 
 ```bash
-go build ./cmd/rss-to-bsky   # compile check
-go vet ./...                 # static checks
-go test ./...                # run the test suite
+make check   # build + vet + test
+make run     # sources .env, then runs the service
+```
+
+Or run the underlying commands directly:
+
+```bash
+go build ./...   # compile check
+go vet ./...      # static checks
+go test ./...     # run the test suite
 
 set -a; source .env; set +a  # load .env into the shell
 DB_PATH=./data/posted.db go run ./cmd/rss-to-bsky
 ```
 
-`main()` doesn't read `.env` itself — only Docker Compose's `env_file` does — so it needs to be sourced into the shell first. The default `DB_PATH` (`/data/posted.db`) targets the Docker volume mount and generally isn't writable outside a container, so override it for local runs.
+`main()` doesn't read `.env` itself — only Docker Compose's `env_file` does — so it needs to be sourced into the shell first (`make run` does this for you). The default `DB_PATH` (`/data/posted.db`) targets the Docker volume mount and generally isn't writable outside a container, so override it for local runs.
 
 ## Project layout
 
 ```
 cmd/rss-to-bsky/main.go   — entrypoint: opens the store, runs once, then starts the cron scheduler
 internal/feed/            — fetches and parses the RSS feed into postable items
-internal/bluesky/         — minimal AT Protocol HTTP client (login, create post record)
+internal/bluesky/         — minimal AT Protocol HTTP client (login, create post record, upload preview thumbnail)
+internal/opengraph/       — fetches Open Graph metadata from a linked article for the preview card
 internal/store/           — SQLite-backed dedup store, including schema migrations
 ```
 
