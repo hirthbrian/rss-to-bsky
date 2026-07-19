@@ -7,10 +7,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
-const baseURL = "https://bsky.social"
+// baseURL is a var (not a const) so tests can point it at a mock server.
+var baseURL = "https://bsky.social"
 
 // Session holds the credentials returned by com.atproto.server.createSession.
 type Session struct {
@@ -48,16 +50,41 @@ func Login(handle, appPassword string) (*Session, error) {
 	return &sess, nil
 }
 
-// Post creates a single app.bsky.feed.post record.
-func (s *Session) Post(text string) error {
+// Post creates a single app.bsky.feed.post record. If link is non-empty and
+// occurs in text, it's marked with a rich-text facet so Bluesky renders it
+// as a clickable link instead of plain text.
+func (s *Session) Post(text, link string) error {
+	post := map[string]interface{}{
+		"$type":     "app.bsky.feed.post",
+		"text":      text,
+		"createdAt": time.Now().UTC().Format(time.RFC3339),
+	}
+
+	// Facet byte offsets are UTF-8 byte indices into text; Go string
+	// indexing is already byte-based, so no rune conversion is needed.
+	if link != "" {
+		if start := strings.Index(text, link); start >= 0 {
+			post["facets"] = []map[string]interface{}{
+				{
+					"index": map[string]int{
+						"byteStart": start,
+						"byteEnd":   start + len(link),
+					},
+					"features": []map[string]interface{}{
+						{
+							"$type": "app.bsky.richtext.facet#link",
+							"uri":   link,
+						},
+					},
+				},
+			}
+		}
+	}
+
 	record := map[string]interface{}{
 		"collection": "app.bsky.feed.post",
 		"repo":       s.Did,
-		"record": map[string]interface{}{
-			"$type":     "app.bsky.feed.post",
-			"text":      text,
-			"createdAt": time.Now().UTC().Format(time.RFC3339),
-		},
+		"record":     post,
 	}
 
 	body, err := json.Marshal(record)

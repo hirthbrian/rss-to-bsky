@@ -13,6 +13,7 @@ const maxPostChars = 280
 type Item struct {
 	GUID string
 	Text string
+	Link string
 }
 
 func Fetch(url string) ([]Item, error) {
@@ -34,17 +35,27 @@ func Fetch(url string) ([]Item, error) {
 		items = append(items, Item{
 			GUID: guid,
 			Text: formatPost(raw),
+			Link: raw.Link,
 		})
 	}
 	return items, nil
 }
 
+// formatPost builds the post text, truncating only the title so the link
+// (if present) always survives intact. A partially truncated URL would be
+// both broken and unmatchable against the rich-text facet Bluesky needs to
+// render it as a clickable link.
 func formatPost(item *gofeed.Item) string {
-	text := item.Title
-	if item.Link != "" {
-		text = fmt.Sprintf("%s\n%s", text, item.Link)
+	if item.Link == "" {
+		return truncate(item.Title, maxPostChars)
 	}
-	return truncate(text, maxPostChars)
+
+	budget := maxPostChars - len([]rune(item.Link)) - 1 // -1 for the separating newline
+	if budget < 0 {
+		budget = 0
+	}
+
+	return fmt.Sprintf("%s\n%s", truncate(item.Title, budget), item.Link)
 }
 
 func truncate(s string, max int) string {

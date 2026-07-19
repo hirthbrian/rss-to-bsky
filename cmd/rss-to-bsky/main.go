@@ -79,7 +79,7 @@ func runOnce(st *store.Store, rssURL, handle, appPassword string) error {
 			}
 		}
 
-		if err := sess.Post(item.Text); err != nil {
+		if err := sess.Post(item.Text, item.Link); err != nil {
 			return fmt.Errorf("posting %q: %w", item.GUID, err)
 		}
 
